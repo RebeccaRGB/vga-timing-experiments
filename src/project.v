@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2024 Your Name
+ * Copyright (c) 2024 Rebecca G. Bettencourt
  * SPDX-License-Identifier: Apache-2.0
  */
 
 `default_nettype none
 
-module tt_um_example (
+module tt_um_rebeccargb_vga_timing_experiments (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
@@ -16,12 +16,106 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
+  // VGA timing parameters
+  reg [11:0] hdisplay;
+  reg [9:0] hfrontporch;
+  reg [9:0] hsynclength;
+  reg [9:0] hbackporch;
+  reg hsyncpolarity;
+  reg [11:0] vdisplay;
+  reg [7:0] vfrontporch;
+  reg [7:0] vsynclength;
+  reg [7:0] vbackporch;
+  reg vsyncpolarity;
+
+  // VGA signals
+  wire hsync;
+  wire vsync;
+  wire display;
+  wire [11:0] hpos;
+  wire [11:0] vpos;
+  wire [1:0] R;
+  wire [1:0] G;
+  wire [1:0] B;
+
+  // TinyVGA PMOD
+  assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
+
+  // Unused outputs assigned to 0.
   assign uio_out = 0;
   assign uio_oe  = 0;
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  // Suppress unused signals warning
+  wire _unused_ok = &{ena, ui_in, uio_in};
+
+  hvsync_generator hvsync_gen(
+    .hdisplay(hdisplay),
+    .hfrontporch(hfrontporch),
+    .hsynclength(hsynclength),
+    .hbackporch(hbackporch),
+    .hsyncpolarity(hsyncpolarity),
+    .vdisplay(vdisplay),
+    .vfrontporch(vfrontporch),
+    .vsynclength(vsynclength),
+    .vbackporch(vbackporch),
+    .vsyncpolarity(vsyncpolarity),
+    .clk(clk),
+    .reset(~rst_n),
+    .hsync(hsync),
+    .vsync(vsync),
+    .display(display),
+    .hpos(hpos),
+    .vpos(vpos)
+  );
+
+  reg [4:0] pattern;
+  reg [5:0] color_in;
+  wire [5:0] color_out;
+
+  pattern_generator pat(
+    .hsize(hdisplay),
+    .vsize(vdisplay),
+    .hpos(hpos),
+    .vpos(vpos),
+    .pattern(pattern),
+    .color_in(color_in),
+    .color_out(color_out)
+  );
+
+  assign R = display ? color_out[5:4] : 2'b00;
+  assign G = display ? color_out[3:2] : 2'b00;
+  assign B = display ? color_out[1:0] : 2'b00;
+
+  always @(posedge ui_in[7])
+  begin
+    case (ui_in[3:0])
+      4'd0: hdisplay <= {1'b0, ui_in[6:4], uio_in};
+      4'd1: hfrontporch <= {ui_in[5:4], uio_in};
+      4'd2: {hsyncpolarity, hsynclength} <= {ui_in[6], ui_in[5:4], uio_in};
+      4'd3: hbackporch <= {ui_in[5:4], uio_in};
+      4'd4: vdisplay <= {1'b0, ui_in[6:4], uio_in};
+      4'd5: vfrontporch <= uio_in;
+      4'd6: {vsyncpolarity, vsynclength} <= {ui_in[6], uio_in};
+      4'd7: vbackporch <= uio_in;
+      4'd8: color_in <= uio_in[5:0];
+      4'd9: pattern <= uio_in[4:0];
+      4'd10: pattern <= pattern + 1;
+      4'd11: pattern <= pattern - 1;
+      4'd15: begin
+        hdisplay <= 640;
+        hfrontporch <= 16;
+        hsynclength <= 96;
+        hbackporch <= 48;
+        hsyncpolarity <= 0;
+        vdisplay <= 480;
+        vfrontporch <= 10;
+        vsynclength <= 2;
+        vbackporch <= 33;
+        vsyncpolarity <= 0;
+        pattern <= 5'd31;
+        color_in <= 0;
+      end
+    endcase
+  end
 
 endmodule

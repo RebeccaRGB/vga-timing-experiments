@@ -36,7 +36,14 @@ async def test_project(dut):
         dut.uio_in.value = d & 0xFF
         await ClockCycles(dut.clk, 1)
 
+    async def vga_reset():
+        dut.rst_n.value = 0
+        await ClockCycles(dut.clk, 1)
+        dut.rst_n.value = 1
+        await ClockCycles(dut.clk, 1)
+
     await reg_write(0, 0)
+    await vga_reset()
     assert dut.uo_out.value == 0b01110111
 
     # Keep testing the module by changing the input values, waiting for

@@ -17,8 +17,8 @@ async def test_project(dut):
     # Reset
     dut._log.info("Reset")
     dut.ena.value = 1
-    dut.ui_in.value = 0xFF
-    dut.uio_in.value = 0xFF
+    dut.ui_in.value = 0x80
+    dut.uio_in.value = 0
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
@@ -26,8 +26,8 @@ async def test_project(dut):
     dut._log.info("Test project behavior")
 
     # Set the input values you want to test
-    dut.ui_in.value = 0x7F
-    dut.uio_in.value = 0xFF
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
 
     # Wait for one clock cycle to see the output values
     await ClockCycles(dut.clk, 1)
@@ -38,49 +38,49 @@ async def test_project(dut):
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
-    dut.ui_in.value = 0x89
+    dut.ui_in.value = 0x83
     dut.uio_in.value = 0x00
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x09
+    dut.ui_in.value = 0x03
     dut.uio_in.value = 0x00
     await ClockCycles(dut.clk, 1)
 
-    dut.ui_in.value = 0x88
+    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x00
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x08
+    dut.ui_in.value = 0x0C
     dut.uio_in.value = 0x00
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 0b00000000
 
-    dut.ui_in.value = 0x88
+    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x03
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x08
+    dut.ui_in.value = 0x0C
     dut.uio_in.value = 0x03
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 0b01000100
 
-    dut.ui_in.value = 0x88
+    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x0C
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x08
+    dut.ui_in.value = 0x0C
     dut.uio_in.value = 0x0C
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 0b00100010
 
-    dut.ui_in.value = 0x88
+    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x30
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x08
+    dut.ui_in.value = 0x0C
     dut.uio_in.value = 0x30
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 0b00010001
 
-    dut.ui_in.value = 0x88
+    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x3F
     await ClockCycles(dut.clk, 1)
-    dut.ui_in.value = 0x08
+    dut.ui_in.value = 0x0C
     dut.uio_in.value = 0x3F
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 0b01110111

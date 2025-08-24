@@ -73,9 +73,9 @@ async def test_project(dut):
                 framebuffer[offset+3*i:offset+3*i+3] = palette[dut.uo_out.value.integer]
             await ClockCycles(dut.clk, 1)
 
-    async def skip_frame(frame_num):
+    async def skip_frame(frame_num, passed_clocks=0):
         dut._log.info(f"Skipping frame {frame_num}")
-        await ClockCycles(dut.clk, H_TOTAL*V_TOTAL)
+        await ClockCycles(dut.clk, (H_TOTAL*V_TOTAL)-passed_clocks)
 
     async def capture_frame(frame_num, check_sync=True):
         framebuffer = bytearray(V_DISPLAY*H_DISPLAY*3)
@@ -105,41 +105,65 @@ async def test_project(dut):
     frame = await capture_frame(0)
     frame.save(f"output/frame0.png")
 
-    dut.ui_in.value = 0x83
-    await skip_frame(1)
     dut.ui_in.value = 3
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x83
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 3
+    await ClockCycles(dut.clk, 1)
+    await skip_frame(1, 3)
 
     frame = await capture_frame(1)
     frame.save(f"output/frame1.png")
 
-    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x03
-    await skip_frame(2)
+    await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x8C
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    await skip_frame(2, 4)
 
     frame = await capture_frame(2)
     frame.save(f"output/frame2.png")
 
-    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x0C
-    await skip_frame(3)
+    await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x8C
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    await skip_frame(3, 4)
 
     frame = await capture_frame(3)
     frame.save(f"output/frame3.png")
 
-    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x30
-    await skip_frame(4)
+    await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x8C
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    await skip_frame(4, 4)
 
     frame = await capture_frame(4)
     frame.save(f"output/frame4.png")
 
-    dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x3F
-    await skip_frame(5)
+    await ClockCycles(dut.clk, 1)
     dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x8C
+    await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 12
+    await ClockCycles(dut.clk, 1)
+    await skip_frame(5, 4)
 
     frame = await capture_frame(5)
     frame.save(f"output/frame5.png")

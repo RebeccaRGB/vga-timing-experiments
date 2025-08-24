@@ -102,7 +102,7 @@ module tt_um_rebeccargb_vga_timing_experiments (
   always @(posedge ui_in[7], negedge rst_n) begin
     if (~rst_n) begin
       preset;
-    end else begin
+    end else if (ui_in[7]) begin
       case (ui_in[3:0])
         4'd0: preset;
         4'd1: pattern <= pattern + 1;

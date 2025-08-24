@@ -107,7 +107,7 @@ async def test_project(dut):
 
     dut.ui_in.value = 0x83
     await skip_frame(1)
-    dut.ui_in.value = 0
+    dut.ui_in.value = 3
 
     frame = await capture_frame(1)
     frame.save(f"output/frame1.png")
@@ -115,8 +115,7 @@ async def test_project(dut):
     dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x03
     await skip_frame(2)
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
+    dut.ui_in.value = 12
 
     frame = await capture_frame(2)
     frame.save(f"output/frame2.png")
@@ -124,8 +123,7 @@ async def test_project(dut):
     dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x0C
     await skip_frame(3)
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
+    dut.ui_in.value = 12
 
     frame = await capture_frame(3)
     frame.save(f"output/frame3.png")
@@ -133,8 +131,7 @@ async def test_project(dut):
     dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x30
     await skip_frame(4)
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
+    dut.ui_in.value = 12
 
     frame = await capture_frame(4)
     frame.save(f"output/frame4.png")
@@ -142,8 +139,7 @@ async def test_project(dut):
     dut.ui_in.value = 0x8C
     dut.uio_in.value = 0x3F
     await skip_frame(5)
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
+    dut.ui_in.value = 12
 
     frame = await capture_frame(5)
     frame.save(f"output/frame5.png")
